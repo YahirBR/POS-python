@@ -9,6 +9,7 @@ PALETA_NOCHE = {
     "texto":        "#E0E0E0",
     "acento":       "#4CAF50",  # verde para total y destacados
     "encabezado":   "#3A3A3A",
+    "presionado":     "#1A1A1A",
 }
 
 PALETA_DIA = {
@@ -17,6 +18,7 @@ PALETA_DIA = {
     "texto":        "#202020",
     "acento":       "#2E7D32",  # verde más oscuro para que se lea sobre claro
     "encabezado":   "#DCDCDC",
+    "presionado":     "#D0D0D0",
 }
 
 #obtener ruta correcta de la BD
@@ -92,8 +94,8 @@ class AppPOS:
         self.crear_pestana_inventario()
         self.crear_pestana_ventas()
         self.crear_pestana_dashboard()
-        self.aplicar_tema("noche")
-
+        self.modo_actual = "dia"
+        self.aplicar_tema("dia")
 
     #============================
     #dEFINIR TEMA OSCURO O CLARO 
@@ -108,11 +110,25 @@ class AppPOS:
         estilo.configure("TFrame", background=paleta["fondo"])
         estilo.configure("TLabel", background=paleta["fondo"], foreground=paleta["texto"])
         estilo.configure("TButton", background=paleta["fondo_caja"], foreground=paleta["texto"])
+        estilo.map("TButton", background=[("active", paleta["encabezado"]), ("pressed", paleta["presionado"])])
         estilo.configure("TEntry", fieldbackground=paleta["fondo_caja"], foreground=paleta["texto"])
         estilo.configure("TNotebook", background=paleta["fondo"])
-        estilo.configure("TNotebook.Tab", background=paleta["encabezado"], foreground=paleta["texto"])
+        estilo.configure("TNotebook.Tab", background=paleta["fondo_caja"], foreground=paleta["texto"])
+        estilo.map("TNotebook.Tab", background=[("selected", paleta["fondo"])], foreground=[("selected", paleta["acento"])])
         estilo.configure("Treeview", background=paleta["fondo_caja"], fieldbackground=paleta["fondo_caja"], foreground=paleta["texto"])
         estilo.configure("Treeview.Heading", background=paleta["encabezado"], foreground=paleta["texto"])
+        estilo.map("Treeview.Heading", background=[("active", paleta["encabezado"])])
+    #==========================
+    #aplicar tema oscuro o claro
+    #==========================
+    def  alternar_tema(self):
+        if self.modo_actual == "noche":
+            self.modo_actual = "dia"
+        else :
+            self.modo_actual = "noche"
+        self.aplicar_tema(self.modo_actual)
+
+    
     #==========================
     #Pestaña Inventario (Registrar Productos,)
     #==========================
@@ -330,6 +346,9 @@ class AppPOS:
         )
         btn_agregar.pack(side="left", padx=5)
 
+        self.btn_tema = ttk.Button(frame_top, text="Cambiar tema", command=self.alternar_tema)
+        self.btn_tema.pack(side="right", padx=5)
+
         #Tabla del Carrito de Ventas
         self.tabla_cart = ttk.Treeview(
             self.ventana_ventas,
@@ -474,9 +493,6 @@ class AppPOS:
 if __name__ == "__main__":
     raiz = tk.Tk()
     app = AppPOS(raiz)
-    print(app.obtener_ventas_por_periodo("hoy"))
-    print(app.obtener_ventas_por_periodo("semana"))
-    print(app.obtener_ventas_por_periodo("mes"))
     raiz.mainloop()
                     
 
